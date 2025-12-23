@@ -5,6 +5,7 @@ import { inngest } from "@/config/inngest";
 import User from "@/models/User";
 
 
+
 export async function POST(request) {
     try{
         const {userId} = getAuth(request)
@@ -15,7 +16,7 @@ export async function POST(request) {
         // calculate amount using items
         const amount = await items.reduce(async(acc,item)=>{
             const product = await Product.findById(item.product);
-            return acc + product.offerPrice*item.quantity;
+            return await acc + product.offerPrice*item.quantity;
         },0)
 
         await inngest.send({
@@ -24,7 +25,7 @@ export async function POST(request) {
                 userId, 
                 address, 
                 items,
-                amount: amount +Math.floor(amount*0.02),
+                amount: amount + Math.floor(amount*0.02),
                 date:Date.now()
             }
         })
@@ -37,7 +38,7 @@ export async function POST(request) {
         return NextResponse.json({success:true,message:"Order placed successfully"})
 
     } catch(error){
-        console.log("Error in creating order:", error);
+       
         return NextResponse.json({ success: false, message: error.message });
     }
 }
